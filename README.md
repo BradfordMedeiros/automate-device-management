@@ -6,6 +6,15 @@ Runs from this project.
 
 Uses stork to manage devices
 
+The location project outputs data which will be used to populate the stork device list.
+I think probably will emit mqtt topics?  on_added/on_deleted?
+
+and then we can probably just stork device -a/-r from for this
+
+? should location ui  directly reference stork?
+I'd rather not, come up w/ solution to be able to link into a stork page for the device
+from the config app though -> iframe maybe?
+
 
 Uses stork to manage automate system.
 ----
