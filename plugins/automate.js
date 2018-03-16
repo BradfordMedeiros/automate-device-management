@@ -2,7 +2,7 @@
 /*
   reachability info look like:
   {
-    ip_address: x,
+    ipAddress: x,
     user: y,
     password: password,
   }
@@ -10,10 +10,22 @@
 
   config looks like:
   {
-    docker_image: <some_image_url>
+    dockerImage: <some_image_url>
   }
 
  */
+
+const child_process = require('child_process');
+
+const runCommand = (command, { user, password, ipAddress }) => new Promise((resolve, reject) => {
+  child_process.exec(`sshpass -p "root" ssh ${user}@${ipAddress} -p 9000 "${command}"`,  (error, stdout, stderr) => {
+    if (error){
+      reject(stderr);
+    }else{
+      resolve(stdout);
+    }
+  });
+});
 
 const automate = {
   type: 'automate',
@@ -21,7 +33,7 @@ const automate = {
     try {
       const data = JSON.parse(identification);
       return (
-        typeof(data.ip_address) === 'string' &&
+        typeof(data.ipAddress) === 'string' &&
         typeof(data.user) === 'string' &&
         typeof(data.password) === 'string'
       )
@@ -33,17 +45,21 @@ const automate = {
     try {
       const data = JSON.parse(config);
       return (
-        typeof(data.docker_image) === 'string'
+        typeof(data.dockerImage) === 'string'
       )
     }catch(e){
       return false;
     }
   },
-  status: async () => {
-    return 'ok';
+  status: async reachabilityInfo => {
+    return await runCommand('touch /someshit', {
+      user:  reachabilityInfo.user,
+      password: reachabilityInfo.password,
+      ipAddress: reachabilityInfo.ipAddress,
+    });
   },
-  config: async configText => {
-
+  config: async (configText, reachabilityInfo) => {
+    return 'ok';
   },
   commands:  {
     unlock: async () => "ok",
