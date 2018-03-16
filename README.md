@@ -1,5 +1,8 @@
 # automate_dm
 
+# todo 
+-- create stork docker container
+
 docker-compose hosted process which:
 --> Probably will contain a location UI to be able to manage instances
 Runs from this project.
@@ -20,7 +23,7 @@ Uses stork to manage automate system.
 ----
 Plugins for:
 
-automate : managed with ansible, which updates a docker instance. 
+automate : managed with ansible (or maybe just ssh?), which updates a docker instance. 
 
 chipmunk : sends http commands to device
 

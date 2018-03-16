@@ -1,8 +1,8 @@
 
-FROM williamyeh/ansible:1.9-ubuntu14.04
+FROM bradfordmedeiros/storkd_0.1
 
-#WORKDIR /
-#ADD . .
+WORKDIR /automate_dm
+ADD ./plugins .
 
 
 
