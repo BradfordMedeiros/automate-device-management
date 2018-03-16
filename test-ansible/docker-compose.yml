@@ -1,0 +1,6 @@
+version: '3'
+services:
+  ssh-test:
+    image: "rastasheep/ubuntu-sshd"
+    ports: 
+     - "9000:22"
