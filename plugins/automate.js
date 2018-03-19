@@ -1,24 +1,22 @@
 
 /*
   reachability info look like:
-  {
-    ipAddress: x,
-    user: y,
-    password: password,
-  }
+  user=root;password=password;host=host;ip=someIp;
+
   sshpass -p "root" ssh root@localhost -p 9000 "echo hello"
 
   config looks like:
-  {
-    dockerImage: <some_image_url>
-  }
+  dockerImageName
 
  */
 
+
 const child_process = require('child_process');
 
-const runCommand = (command, { user, password, ipAddress }) => new Promise((resolve, reject) => {
-  child_process.exec(`sshpass -p "root" ssh ${user}@${ipAddress} -p 9000 "${command}"`,  (error, stdout, stderr) => {
+const generateCommand = image => `docker rmi -f ${image} && docker pull ${image}`;
+const runCommand = ({ user, password, ipAddress, image }) => new Promise((resolve, reject) => {
+  const command = `sshpass -p ${password} ssh ${user}@${ipAddress} ${generateCommand(image)}`;
+  child_process.exec(command,  (error, stdout, stderr) => {
     if (error){
       reject(stderr);
     }else{
@@ -27,39 +25,44 @@ const runCommand = (command, { user, password, ipAddress }) => new Promise((reso
   });
 });
 
+const getReachData = reachabilityInfo => {
+  const data = reachabilityInfo.split(';');
+  const mapping = { };
+  data.forEach(item => {
+    const values = item.split('=');
+    mapping[values[0]] = values[1];
+  });
+  return mapping;
+};
+
 const automate = {
   type: 'automate',
   isValidReachabilityInfo: identification => {
-    try {
-      const data = JSON.parse(identification);
-      return (
-        typeof(data.ipAddress) === 'string' &&
-        typeof(data.user) === 'string' &&
-        typeof(data.password) === 'string'
-      )
-    }catch(e){
-      return false;
-    }
+    const reachInfo = getReachData(identification);
+    console.log(reachInfo);
+    return reachInfo.user && reachInfo.password && reachInfo.ipAddress;
   },
-  isValidConfig:  config => {
-    try {
-      const data = JSON.parse(config);
-      return (
-        typeof(data.dockerImage) === 'string'
-      )
-    }catch(e){
-      return false;
-    }
-  },
+  isValidConfig:  config => true,
   status: async reachabilityInfo => {
-    return await runCommand('touch /someshit', {
-      user:  reachabilityInfo.user,
-      password: reachabilityInfo.password,
-      ipAddress: reachabilityInfo.ipAddress,
+    const data = getReachData(reachabilityInfo);
+    return await runCommand('echo hello', {
+      user:  data.user,
+      password: data.password,
+      ipAddress: data.ipAddress,
     });
   },
   config: async (configText, reachabilityInfo) => {
-    return 'ok';
+    const image = configText;
+    const data = getReachData(reachabilityInfo);
+    console.log('configuring with: ', image);
+    const isRun = await runCommand({
+      user: data.user,
+      password: data.password,
+      ipAddress: data.ipAddress,
+      image,
+    });
+    console.log('finished running');
+    return isRun;
   },
   commands:  {
     unlock: async () => "ok",
