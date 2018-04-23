@@ -1,6 +1,0 @@
-version: '3'
-services:
-  storkd:
-    image: "bradfordmedeiros/storkd_0.1"
-    ports: 
-     - "5000:5000"
