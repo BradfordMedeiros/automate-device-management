@@ -3,8 +3,8 @@ let value = 10;
 let status = 'ok';
 
 const mockSlave = {
-  mock_slave: {
-    type: 'mock_slave',
+  chipmunk: {
+    type: 'chipmunk',
     get_value: () => value,
     change_status: newStatus => {
       status = newStatus;
@@ -33,4 +33,4 @@ const mockSlave = {
   }
 };
 
-module.exports = mockSlave.mock_slave;
+module.exports = mockSlave.chipmunk;
